@@ -11,6 +11,19 @@ fetch('https://random-word-api.herokuapp.com/word?number=1')
         generateButtons(alphabetList);
         generateEmptySlots(String(data));
 
+        fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${data}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data[0]) {
+                    def = data[0]['meanings'][0]['definitions'][0]['definition']
+                    document.querySelector('#hint-div').innerHTML = def;
+                    document.querySelector('#hint-div').style.display = 'none';
+                } else {
+                    document.querySelector('#hint-div').innerHTML = 'No definitions found.';
+                    document.querySelector('#hint-div').style.display = 'none';
+                }
+            })
+
         document.querySelectorAll('button').forEach(element => {
             element.addEventListener('click', () => {
                 const buttonLetter = element.innerHTML;
@@ -28,7 +41,7 @@ fetch('https://random-word-api.herokuapp.com/word?number=1')
         };
         
         document.querySelector('#hint-button').addEventListener('click', () => {
-            displayHint(String(data));
+            displayHint();
         })
 });
     })
@@ -126,10 +139,9 @@ function playAgain() {
     }
 }
 
-function displayHint(word) {
-    const hint = `The word begins with ${word.split('')[0]}.`
+function displayHint() {
     const div = document.querySelector('#hint-div');
-    div.innerHTML = hint;
+    div.style.display = 'block';
 
-    document.querySelector('#hint-button').remove();
+    document.querySelector('#hint-button').style.display = 'none';
 }   
