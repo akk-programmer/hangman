@@ -1,11 +1,14 @@
 const alphabetList = 'abcdefghijklmnopqrstuvwxyz'.split('');
 
 let guesses = 10;
-let arrayOfLettersGuessed = [];
+let arrayOfLettersGuessed = []
+let hint = ' '
+let word = ' '
 
 fetch('https://random-word-api.herokuapp.com/word?number=1')
     .then(response => response.json())
     .then(data => {
+        word = String(data);
         document.querySelector('#guesses-box').innerHTML = guesses;
 
         generateButtons(alphabetList);
@@ -15,12 +18,8 @@ fetch('https://random-word-api.herokuapp.com/word?number=1')
             .then(response => response.json())
             .then(data => {
                 if (data[0]) {
-                    def = data[0]['meanings'][0]['definitions'][0]['definition']
-                    document.querySelector('#hint-div').innerHTML = def;
-                    document.querySelector('#hint-div').style.display = 'none';
-                } else {
-                    document.querySelector('#hint-div').innerHTML = 'No definitions found.';
-                    document.querySelector('#hint-div').style.display = 'none';
+                    let def = data[0]['meanings'][0]['definitions'][0]['definition']
+                    hint = def;
                 }
             })
 
@@ -140,8 +139,20 @@ function playAgain() {
 }
 
 function displayHint() {
+    let letters_not_guessed = []
     const div = document.querySelector('#hint-div');
     div.style.display = 'block';
+    if (hint !== ' ') {
+        div.innerHTML = hint;
+    } else {
+        for(let i = 0; i < word.length; i++) {
+            if (!arrayOfLettersGuessed.includes(word[i])) {
+                letters_not_guessed.push(word[i]);
+            }
+        }
+
+        div.innerHTML = `Try the letter '${letters_not_guessed[Math.floor(Math.random()) * letters_not_guessed.length]}'`
+    }
 
     document.querySelector('#hint-button').style.display = 'none';
 }   
